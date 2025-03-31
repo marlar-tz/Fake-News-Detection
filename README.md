@@ -1,6 +1,6 @@
 # Fake News Detection Project
 
-This title of the project is Fake News Detection and it follows the CM3060 Natural Language Processing template.
+The title of the project is Fake News Detection and it follows the CM3060 Natural Language Processing template.
 
 ## Table of contents
 
