@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detection</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery for AJAX -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f0e6;
+            color: #2a5674;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            /* White container background */
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            border-bottom: 2px solid #e6dfd0;
+            /* Light border */
+            padding-bottom: 20px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1d3e53;
+        }
+
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-heading {
+            font-size: 42px;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 600;
+            color: #1d3e53;
+            /* Darker teal for heading */
+
+        }
+
+        #predictionForm {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 30px;
+        }
+
+        #textInput {
+            width: 100%;
+            height: 160px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e6dfd0;
+            background-color: #ffffff;
+            color: #555555;
+            font-size: 16px;
+            resize: none;
+        }
+
+        #textInput:focus {
+            outline: none;
+            border-color: #ff7e5f;
+            /* Coral accent */
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .predict-button {
+            background-color: #ff7e5f;
+            /* Coral button */
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(255, 126, 95, 0.3);
+
+        }
+
+        .predict-button:hover {
+            background-color: #ff6347;
+            /* Darker coral on hover */
+            transform: translateY(-2px);
+        }
+
+        #result {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f9f7f2;
+            /* Lighter background for result */
+            border-radius: 10px;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .prediction-text {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1d3e53;
+            /* Darker teal */
+
+        }
+
+        .prediction-text.fake {
+            color: #e74c3c;
+            /* Red for FAKE */
+        }
+
+        .prediction-text.real {
+            color: #27ae60;
+            /* Green for REAL */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #imageResult1,
+        #imageResult2 {
+            margin-top: 20px;
+            text-align: center;
+            width: 80%;
+            /* Make graphs smaller */
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #imageResult1 img,
+        #imageResult2 img {
+            max-width: 100%;
+            border-radius: 8px;
+            height: auto;
+        }
+
+        /* Custom styling for the graphs */
+        .graph-container {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .graph-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1d3e53;
+            text-align: center;
+        }
+
+        .graph-description {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #4a6b82;
+            text-align: left;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background-color: #f9f7f2;
+            border-left: 3px solid #ff7e5f;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Fake News Prediction</div>
+
+        </div>
+
+        <div class="main-content">
+            <h1 class="main-heading">Check the news !</h1>
+
+            <form id="predictionForm">
+                <textarea id="textInput" name="text" placeholder="Enter the news here..."></textarea>
+                <div class="button-container">
+                    <button type="submit" class="predict-button">Predict</button>
+                </div>
+            </form>
+
+            <div id="result" class="hidden">
+                <div class="prediction-text"></div>
+            </div>
+
+
+
+            <div id="imageResult1" class="hidden">
+                <div class="graph-title">Most Influential Words in Fake News Detection</div>
+                <div class="graph-description">
+                    The bar graph below shows the 20 most important words used by the fake news detection model. Each
+                    bar represents how much a word influences the model's decision. Based on the direction of the bars,
+                    we can see whether a word has a negative or positive impact on the model's prediction.
+                </div>
+                <div class="graph-container"></div>
+            </div>
+
+            <div id="imageResult2" class="hidden">
+                <div class="graph-title">Impact of Key Features on Fake News Detection</div>
+                <div class="graph-description">
+                    The bar graph below shows the importance of four features in the fake news detection model: number
+                    of URLs, number of pronouns, number of special characters, and sentiment score. The graph
+                    illustrates how each feature influences the model's decision. From the graph, we can see that the
+                    number of URLs has the most impact on the model's prediction.
+                </div>
+                <div class="graph-container"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Handle form submission
+            $("#predictionForm").submit(function (event) {
+                event.preventDefault();  // Prevent default form submission
+
+                // Get the text input value
+                var text = $("#textInput").val();
+
+                if (!text.trim()) {
+                    alert("Please enter some text to analyze");
+                    return;
+                }
+
+                // Send data via AJAX
+                $.ajax({
+                    type: "POST",
+                    url: "/",  // Post to the same route
+                    data: { text: text },
+                    success: function (response) {
+                        // Handle the response
+
+                        let predictionText = response.prediction === "FAKE" ? "FAKE" : "REAL";
+
+                        $('#result').removeClass('hidden');
+                        $('.prediction-text').text(predictionText)
+                            .removeClass('fake real')
+                            .addClass(response.prediction.toLowerCase());
+
+                        // Store the images and apply custom styling
+                        $('#imageResult1').removeClass('hidden');
+                        $('#imageResult2').removeClass('hidden');
+
+                        // Add images to containers
+                        $('#imageResult1 .graph-container').html("<img src='" + response.image_url + "' alt='Feature Importance Plot' class='graph-image'>");
+                        $('#imageResult2 .graph-container').html("<img src='" + response.cust_image_url + "' alt='Feature Importance Plot' class='graph-image'>");
+
+                        // Apply red color to bars in graphs using CSS filter
+                        setTimeout(function () {
+                            $('.graph-image').css({
+                                'filter': 'hue-rotate(320deg) saturate(1.5)', // Convert blue to red
+                                'width': '100%',
+                                'height': 'auto'
+                            });
+                        }, 100);
+                    },
+                    error: function () {
+                        $('#result').removeClass('hidden');
+                        $('.prediction-text')
+                            .text("Error")
+                            .removeClass('fake real');
+
+                        $('#result').append("<p>Error processing your request. Please try again.</p>");
+
+                    }
+                });
+            });
+
+
+        });
+    </script>
+</body>
+
+</html>
