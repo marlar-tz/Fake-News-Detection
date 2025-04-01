@@ -32,7 +32,8 @@ Users should be able to:
 - Website design(After result)<br>
 ![Website design after result preview](./website%20design/fake%20news%20detection%20after%20result.png)
 
-- Watch the demo<br>
+- Watch the demo
+
 https://github.com/user-attachments/assets/d0cf2701-880b-4c52-9182-10159154de91
 
 ## My process
